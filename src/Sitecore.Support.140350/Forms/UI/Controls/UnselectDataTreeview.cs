@@ -30,6 +30,9 @@ namespace Sitecore.Support.Form.UI.Controls
                 if (ShowRoot)
                 {
                     TreeNode treeNode = GetTreeNode(item, control);
+                    #region modified part - method has been added to change Header in accordance with Display Name
+                    ChangeTreeNodeHeader(treeNode, item);
+                    #endregion
                     treeNode.Expanded = true;
                     treeNode.Selected = false;
                     node = treeNode;
@@ -57,6 +60,9 @@ namespace Sitecore.Support.Form.UI.Controls
                 {
                     TreeNode treeNode = GetTreeNode(child, control);
 
+                    #region modified part - method has been added to change Header in accordance with Display Name
+                    ChangeTreeNodeHeader(treeNode, child);
+                    #endregion
 
                     treeNode.Expandable = dataContext.HasChildren(child);
                     if (dataContext.IsAncestorOf(child, folder))
@@ -97,6 +103,36 @@ namespace Sitecore.Support.Form.UI.Controls
             return str;
         }
 
+        #region modified part - method to change Header in accordance with Display Name
+        private void ChangeTreeNodeHeader(TreeNode treeNode, Item item)
+        {
+            treeNode.Header = item.Name;
+            try
+            {
+                Globalization.Language contextLanguage = Globalization.Language.Parse(Web.WebUtil.GetQueryString("la"));
+
+                if (null != contextLanguage)
+                {
+                    Item tmpItem = null;
+
+                    foreach (Globalization.Language language in item.Languages)
+                    {
+                        tmpItem = item.Database.GetItem(item.ID, language);
+
+                        if ((string.Compare(language.Name, contextLanguage.Name, true) == 0) &&
+                            (tmpItem.Versions.Count > 0))
+                        {
+                            treeNode.Header = tmpItem.DisplayName;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, this);
+            }
+        }
+        #endregion
 
     }
 }

@@ -17,7 +17,9 @@ namespace Sitecore.Support.Form.Core.Pipeline.InsertRenderings.Processors
             {
                 Assert.IsNotNull(args.ContentDatabase, "args.ContentDatabase");
                 Assert.IsNotNull(args.ContextItemPath, "args.ContextItemPath");
-                Item item = args.ContentDatabase.GetItem(args.ContextItemPath, Context.Language);
+                #region modified part - args.ContentLanguage is used instead of Context.Language
+                Item item = args.ContentDatabase.GetItem(args.ContextItemPath, args.ContentLanguage);
+                #endregion
                 Assert.IsNotNull(item, "currentItem");
                 object obj2 = Context.ClientData.GetValue(StaticSettings.PrefixId + StaticSettings.PlaceholderKeyId);
                 string str = (obj2 != null) ? obj2.ToString() : string.Empty;
